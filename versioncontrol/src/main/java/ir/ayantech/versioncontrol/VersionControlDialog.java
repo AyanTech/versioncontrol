@@ -63,11 +63,10 @@ public class VersionControlDialog extends Dialog {
             }
             ((TextView) findViewById(R.id.changeLogTv)).setText(changeLog);
         }
-        manager =
-                new DownloadManager.Builder().context(context)
-                        .downloader(OkHttpDownloader.create())
-                        .threadPoolSize(2)
-                        .build();
+        manager = new DownloadManager.Builder().context(context)
+                .downloader(OkHttpDownloader.create())
+                .threadPoolSize(2)
+                .build();
         findViewById(R.id.positiveTv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

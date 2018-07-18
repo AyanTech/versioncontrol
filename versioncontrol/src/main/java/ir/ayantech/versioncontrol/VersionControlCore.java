@@ -34,7 +34,7 @@ public class VersionControlCore implements VCResponseStatus {
 
     private void initializeApplicationName() {
         try {
-            this.ApplicationName = activity.getPackageName().split(".")[2];
+            this.ApplicationName = activity.getPackageName().split("\\.")[2];
         } catch (Exception e) {
             Log.e("AyanVC:", "Package name is not well formatted.");
         }
