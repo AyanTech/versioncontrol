@@ -133,7 +133,6 @@ public class VersionControlDialog extends Dialog {
                             context.finish();
                     }
                 } catch (Exception e) {
-                    Log.e("AyanVC:", e.getMessage());
                     dismiss();
                     openUrl(context, link);
                 }
