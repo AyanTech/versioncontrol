@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">testcases</string>
+    <string name="testcase1">test with (not-required)</string>
+    <string name="testcase2">test with (optional, page)</string>
+    <string name="testcase3">test with (mandatory, page)</string>
+    <string name="testcase4">test with (optional, direct)</string>
+    <string name="testcase5">test with (mandatory, direct)</string>
+</resources>
