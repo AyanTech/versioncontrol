@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
@@ -70,62 +71,70 @@ public class VersionControlDialog extends Dialog {
         findViewById(R.id.positiveTv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GetLastVersion.LinkType.DIRECT.contentEquals(linkType)) {
-                    if (getRootDirPath(context) == null) {
-                        openUrl(context, link);
-                        return;
-                    }
-                    findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                    findViewById(R.id.progressTv).setVisibility(View.VISIBLE);
-                    String destPath = getRootDirPath(context) + "/newversion" + String.valueOf(new Date().getTime()) + ".apk";
-                    DownloadRequest request = new DownloadRequest.Builder()
-                            .url(link)
-                            .retryTime(5)
-                            .retryInterval(2, TimeUnit.SECONDS)
-                            .progressInterval(100, TimeUnit.MILLISECONDS)
-                            .priority(Priority.HIGH)
-                            .destinationFilePath(destPath)
-                            .downloadCallback(new DownloadCallback() {
-                                @Override
-                                public void onStart(int downloadId, long totalBytes) {
-                                }
-
-                                @Override
-                                public void onRetry(int downloadId) {
-                                }
-
-                                @Override
-                                public void onProgress(int downloadId, long bytesWritten, long totalBytes) {
-                                    long progressPercent = bytesWritten * 100 / totalBytes;
-                                    ((ProgressBar) findViewById(R.id.progressBar)).setProgress((int) progressPercent);
-                                    ((TextView) findViewById(R.id.progressTv)).setText(String.format("%%%s", String.valueOf(progressPercent)));
-                                }
-
-                                @Override
-                                public void onSuccess(int downloadId, String filePath) {
-                                    try {
-                                        installApp(context, filePath);
-                                        if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus)) {
-                                            dismiss();
-                                            context.finish();
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                try {
+                    if (GetLastVersion.LinkType.DIRECT.contentEquals(linkType)) {
+                        if (getRootDirPath(context) == null) {
+                            openUrl(context, link);
+                            return;
+                        }
+                        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                        findViewById(R.id.progressTv).setVisibility(View.VISIBLE);
+                        String destPath = getRootDirPath(context) + "/newversion" + String.valueOf(new Date().getTime()) + ".apk";
+                        DownloadRequest request = new DownloadRequest.Builder()
+                                .url(link)
+                                .retryTime(5)
+                                .retryInterval(2, TimeUnit.SECONDS)
+                                .progressInterval(100, TimeUnit.MILLISECONDS)
+                                .priority(Priority.HIGH)
+                                .destinationFilePath(destPath)
+                                .downloadCallback(new DownloadCallback() {
+                                    @Override
+                                    public void onStart(int downloadId, long totalBytes) {
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(int downloadId, int statusCode, String errMsg) {
-                                }
-                            })
-                            .build();
+                                    @Override
+                                    public void onRetry(int downloadId) {
+                                    }
 
-                    id = manager.add(request);
-                } else if (GetLastVersion.LinkType.PAGE.contentEquals(linkType)) {
+                                    @Override
+                                    public void onProgress(int downloadId, long bytesWritten, long totalBytes) {
+                                        long progressPercent = bytesWritten * 100 / totalBytes;
+                                        ((ProgressBar) findViewById(R.id.progressBar)).setProgress((int) progressPercent);
+                                        ((TextView) findViewById(R.id.progressTv)).setText(String.format("%%%s", String.valueOf(progressPercent)));
+                                    }
+
+                                    @Override
+                                    public void onSuccess(int downloadId, String filePath) {
+                                        try {
+                                            installApp(context, filePath);
+                                            if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus)) {
+                                                dismiss();
+                                                context.finish();
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(int downloadId, int statusCode, String errMsg) {
+                                        Log.e("AyanVC:", errMsg);
+                                        dismiss();
+                                        openUrl(context, link);
+                                    }
+                                })
+                                .build();
+
+                        id = manager.add(request);
+                    } else if (GetLastVersion.LinkType.PAGE.contentEquals(linkType)) {
+                        dismiss();
+                        openUrl(context, link);
+                        if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus))
+                            context.finish();
+                    }
+                } catch (Exception e) {
                     dismiss();
                     openUrl(context, link);
-                    if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus))
-                        context.finish();
                 }
             }
         });
