@@ -14,7 +14,7 @@ allprojects {
     }
 }
 ```
-Then put this lines in your module-level gradle:
+Then put this lines in your module-level build.gradle:
 ```
 implementation 'com.google.code.gson:gson:2.8.2'
 implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
