@@ -40,7 +40,7 @@ If you have to send ExtraInfo object (optional due to your project):
 In this case, your ExtraInfo model will be something like this:
 ```
 public class AppExtraInfo extends ExtraInfoModel {
-    private String Option1 = "x;
+    private String Option1 = "x";
     private String Option2 = "y";
 }
 ```
