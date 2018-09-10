@@ -22,6 +22,7 @@ public class VersionControlCore implements VCResponseStatus {
     private Activity activity;
     private String ApplicationName;
     private String ApplicationType;
+    private String ApplicationVersion;
     private String CategoryName;
     private ExtraInfoModel ExtraInfo;
 
@@ -29,6 +30,7 @@ public class VersionControlCore implements VCResponseStatus {
         this.activity = activity;
         initializeApplicationType();
         initializeApplicationName();
+        initializeApplicationVersion();
         VersionControlAPIs.initialize();
     }
 
@@ -38,6 +40,10 @@ public class VersionControlCore implements VCResponseStatus {
         } catch (Exception e) {
             Log.e("AyanVC:", "Package name is not well formatted.");
         }
+    }
+
+    private void initializeApplicationVersion() {
+        this.setApplicationVersion(getApplicationVersion());
     }
 
     private void initializeApplicationType() {
@@ -68,6 +74,11 @@ public class VersionControlCore implements VCResponseStatus {
         return this;
     }
 
+    public VersionControlCore setApplicationVersion(String applicationVersion) {
+        ApplicationVersion = applicationVersion;
+        return this;
+    }
+
     public VersionControlCore setExtraInfo(ExtraInfoModel extraInfo) {
         ExtraInfo = extraInfo;
         return this;
@@ -75,7 +86,7 @@ public class VersionControlCore implements VCResponseStatus {
 
     public void checkForNewVersion() {
         VersionControlAPIs.checkVersion.callApi(this,
-                new CheckVersion.CheckVersionInputModel(ApplicationName, ApplicationType, CategoryName, getApplicationVersion(), ExtraInfo));
+                new CheckVersion.CheckVersionInputModel(ApplicationName, ApplicationType, CategoryName, ApplicationVersion, ExtraInfo));
     }
 
     @Override

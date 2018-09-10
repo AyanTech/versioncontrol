@@ -16,11 +16,12 @@ public class MainActivity extends AppCompatActivity {
                 .setApplicationName(getApplicationName())
                 .setApplicationType(getApplicationType())
                 .setCategoryName("CafeBazar")
+                .setApplicationVersion("2")
                 .checkForNewVersion();
     }
 
     public String getApplicationName() {
-        return "test";
+        return "testcase5";
     }
 
     public String getApplicationType() {
