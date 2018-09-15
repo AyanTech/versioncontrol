@@ -51,3 +51,10 @@ new VersionControlCore({yourActivity})
                 .setExtraInfo(new AppExtraInfo())
                 .checkForNewVersion();
 ```
+
+# Proguard rules:
+If you are using proguard, you need to exclude this module from obfuscation. In order to do that, add this line in your proguard rules file:
+
+```
+-keep public class ir.ayantech.versioncontrol.** { *; }
+```
