@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <color name="vc_accent">#289E29</color>
+    <color name="vc_background">#ddd</color>
+    <color name="vc_message">#A51B1B</color>
+    <color name="vc_change_log">#2012E6</color>
 </resources>

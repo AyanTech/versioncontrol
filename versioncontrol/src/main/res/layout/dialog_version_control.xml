@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="280dp"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/vc_background">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -14,7 +15,7 @@
             android:id="@+id/titleTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/vc_accent"
             android:textSize="16sp" />
 
         <TextView
@@ -22,14 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textColor="@color/black" />
+            android:textColor="@color/vc_message" />
 
         <TextView
             android:id="@+id/changeLogTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:textColor="@color/black" />
+            android:textColor="@color/vc_change_log" />
 
         <TextView
             android:id="@+id/progressTv"
@@ -38,7 +39,7 @@
             android:layout_marginTop="16dp"
             android:text="%0"
             android:visibility="gone"
-            android:textColor="@color/black"/>
+            android:textColor="@color/vc_black"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -59,7 +60,7 @@
                 android:id="@+id/negativeTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/vc_accent"
                 android:textSize="16sp" />
 
             <TextView
@@ -67,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/vc_accent"
                 android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
