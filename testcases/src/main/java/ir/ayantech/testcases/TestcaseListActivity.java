@@ -9,6 +9,8 @@ import ir.ayantech.versioncontrol.VersionControlCore;
 
 public class TestcaseListActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private VersionControlCore versionControlCore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +24,14 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
         findViewById(R.id.testcase3Button).setOnClickListener(this);
         findViewById(R.id.testcase4Button).setOnClickListener(this);
         findViewById(R.id.testcase5Button).setOnClickListener(this);
+
+        findViewById(R.id.shareBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (versionControlCore != null)
+                    versionControlCore.shareApp();
+            }
+        });
     }
 
     @Override
@@ -33,7 +43,7 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
 
     @NonNull
     private Integer getTestcaseNumber(View v) {
-        Integer testcaseNumber = 0;
+        int testcaseNumber = 0;
         switch (v.getId()) {
             case R.id.testcase1Button:
                 testcaseNumber = 1;
@@ -63,10 +73,11 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
         return "testcase" + testcaseNumber;
     }
 
-    private void runVersionControlTestcase(String testcaseName) {
-        new VersionControlCore(this)
+    private VersionControlCore runVersionControlTestcase(String testcaseName) {
+        versionControlCore = new VersionControlCore(this)
                 .setApplicationName(testcaseName)
                 .setCategoryName("cafebazar")
                 .checkForNewVersion();
+        return versionControlCore;
     }
 }

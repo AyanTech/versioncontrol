@@ -1,14 +1,14 @@
 package ir.ayantech.versioncontrol;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -29,42 +29,70 @@ import java.util.concurrent.TimeUnit;
 import ir.ayantech.versioncontrol.api.CheckVersion;
 import ir.ayantech.versioncontrol.api.GetLastVersion;
 
-public class VersionControlDialog extends Dialog {
+public class VersionControlActivity extends AppCompatActivity {
 
     int id = -1;
     DownloadManager manager;
 
-    public VersionControlDialog(@NonNull final Activity context,
-                                String title,
-                                String message,
-                                List<String> changeLogs,
-                                String positiveButtonText,
-                                String negativeButtonText,
-                                final String updateStatus,
-                                final String linkType,
-                                final String link) {
-        super(context);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.dialog_version_control);
-        this.setCancelable(false);
-        this.setCanceledOnTouchOutside(false);
+    @Override
+    public void onBackPressed() {
+    }
 
-        ((TextView) findViewById(R.id.titleTv)).setText(title);
-        ((TextView) findViewById(R.id.messageTv)).setText(message);
-        ((TextView) findViewById(R.id.positiveTv)).setText(positiveButtonText);
-        ((TextView) findViewById(R.id.negativeTv)).setText(negativeButtonText);
-        if (changeLogs == null)
+    private String getVCTitle() {
+        return getIntent().getStringExtra("title");
+    }
+
+    private String getVCMessage() {
+        return getIntent().getStringExtra("message");
+    }
+
+    private String getVCPositiveButton() {
+        return getIntent().getStringExtra("pos_btn");
+    }
+
+    private String getVCNegativeButton() {
+        return getIntent().getStringExtra("neg_btn");
+    }
+
+    private String getVCLinkType() {
+        return getIntent().getStringExtra("link_type");
+    }
+
+    private String getVCLink() {
+        return getIntent().getStringExtra("link");
+    }
+
+    private String getVCUpdateStatus() {
+        return getIntent().getStringExtra("update_status");
+    }
+
+    private List<String> getVCChangeLogs() {
+        return getIntent().getStringArrayListExtra("change_logs");
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_version_control);
+        this.setFinishOnTouchOutside(false);
+
+        ((TextView) findViewById(R.id.titleTv)).setText(getVCTitle());
+        ((TextView) findViewById(R.id.messageTv)).setText(getVCMessage());
+        ((TextView) findViewById(R.id.positiveTv)).setText(getVCPositiveButton());
+        ((TextView) findViewById(R.id.negativeTv)).setText(getVCNegativeButton());
+        if (getVCChangeLogs() == null)
             findViewById(R.id.changeLogTv).setVisibility(View.GONE);
-        else if (changeLogs.isEmpty())
+        else if (getVCChangeLogs().isEmpty())
             findViewById(R.id.changeLogTv).setVisibility(View.GONE);
         else {
             StringBuilder changeLog = new StringBuilder();
-            for (String s : changeLogs) {
+            for (String s : getVCChangeLogs()) {
                 changeLog.append(s).append("\n");
             }
             ((TextView) findViewById(R.id.changeLogTv)).setText(changeLog);
         }
-        manager = new DownloadManager.Builder().context(context)
+        manager = new DownloadManager.Builder().context(this)
                 .downloader(OkHttpDownloader.create())
                 .threadPoolSize(2)
                 .build();
@@ -72,16 +100,16 @@ public class VersionControlDialog extends Dialog {
             @Override
             public void onClick(View view) {
                 try {
-                    if (GetLastVersion.LinkType.DIRECT.contentEquals(linkType)) {
-                        if (getRootDirPath(context) == null) {
-                            openUrl(context, link);
+                    if (GetLastVersion.LinkType.DIRECT.contentEquals(getVCLinkType())) {
+                        if (getRootDirPath(VersionControlActivity.this) == null) {
+                            openUrl(VersionControlActivity.this, getVCLink());
                             return;
                         }
                         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
                         findViewById(R.id.progressTv).setVisibility(View.VISIBLE);
-                        String destPath = getRootDirPath(context) + "/newversion" + String.valueOf(new Date().getTime()) + ".apk";
+                        String destPath = getRootDirPath(VersionControlActivity.this) + "/newversion" + String.valueOf(new Date().getTime()) + ".apk";
                         DownloadRequest request = new DownloadRequest.Builder()
-                                .url(link)
+                                .url(getVCLink())
                                 .retryTime(5)
                                 .retryInterval(2, TimeUnit.SECONDS)
                                 .progressInterval(100, TimeUnit.MILLISECONDS)
@@ -106,10 +134,10 @@ public class VersionControlDialog extends Dialog {
                                     @Override
                                     public void onSuccess(int downloadId, String filePath) {
                                         try {
-                                            installApp(context, filePath);
-                                            if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus)) {
-                                                dismiss();
-                                                context.finish();
+                                            installApp(VersionControlActivity.this, filePath);
+                                            if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(getVCUpdateStatus())) {
+                                                finish();
+                                                endApplication();
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -119,22 +147,22 @@ public class VersionControlDialog extends Dialog {
                                     @Override
                                     public void onFailure(int downloadId, int statusCode, String errMsg) {
                                         Log.e("AyanVC:", errMsg);
-                                        dismiss();
-                                        openUrl(context, link);
+                                        finish();
+                                        openUrl(VersionControlActivity.this, getVCLink());
                                     }
                                 })
                                 .build();
 
                         id = manager.add(request);
-                    } else if (GetLastVersion.LinkType.PAGE.contentEquals(linkType)) {
-                        dismiss();
-                        openUrl(context, link);
-                        if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus))
-                            context.finish();
+                    } else if (GetLastVersion.LinkType.PAGE.contentEquals(getVCLinkType())) {
+                        finish();
+                        openUrl(VersionControlActivity.this, getVCLink());
+                        if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(getVCUpdateStatus()))
+                            endApplication();
                     }
                 } catch (Exception e) {
-                    dismiss();
-                    openUrl(context, link);
+                    finish();
+                    openUrl(VersionControlActivity.this, getVCLink());
                 }
             }
         });
@@ -145,11 +173,15 @@ public class VersionControlDialog extends Dialog {
                     manager.cancel(id);
                 } catch (Exception e) {
                 }
-                dismiss();
-                if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(updateStatus))
-                    context.finish();
+                finish();
+                if (CheckVersion.UpdateStatus.MANDATORY.contentEquals(getVCUpdateStatus()))
+                    endApplication();
             }
         });
+    }
+
+    private void endApplication() {
+        android.os.Process.sendSignal(android.os.Process.myPid(), android.os.Process.SIGNAL_KILL);
     }
 
     private void installApp(Context context, String path) {

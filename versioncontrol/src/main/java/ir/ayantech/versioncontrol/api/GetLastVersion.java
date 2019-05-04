@@ -1,5 +1,6 @@
 package ir.ayantech.versioncontrol.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ir.ayantech.versioncontrol.model.ExtraInfoModel;
@@ -55,19 +56,20 @@ public class GetLastVersion extends VersionControlAPI<GetLastVersion.GetLastVers
     }
 
     public class GetLastVersionOutputModel {
-        private List<String> ChangeLogs;
+        private ArrayList<String> ChangeLogs;
         private String Link;
         private String LinkType;
+        private String TextToShare;
         private String Title;
         private String Body;
         private String AcceptButtonText;
         private String RejectButtonText;
 
-        public List<String> getChangeLogs() {
+        public ArrayList<String> getChangeLogs() {
             return ChangeLogs;
         }
 
-        public void setChangeLogs(List<String> changeLogs) {
+        public void setChangeLogs(ArrayList<String> changeLogs) {
             ChangeLogs = changeLogs;
         }
 
@@ -101,6 +103,14 @@ public class GetLastVersion extends VersionControlAPI<GetLastVersion.GetLastVers
 
         public String getRejectButtonText() {
             return RejectButtonText;
+        }
+
+        public String getTextToShare() {
+            return TextToShare;
+        }
+
+        public void setTextToShare(String textToShare) {
+            TextToShare = textToShare;
         }
     }
 
