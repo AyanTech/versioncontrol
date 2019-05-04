@@ -17,6 +17,8 @@ import ir.ayantech.versioncontrol.api.VersionControlAPIs;
 import ir.ayantech.versioncontrol.model.ExtraInfoModel;
 import ir.ayantech.versioncontrol.model.VCResponseModel;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 /**
  * Created by Administrator on 11/5/2017.
  */
@@ -113,6 +115,7 @@ public class VersionControlCore implements VCResponseStatus {
             intent.putExtra("update_status", VersionControlAPIs.checkVersion.getResponse().getParameters().getUpdateStatus());
             intent.putExtra("link_type", model.getParameters().getLinkType());
             intent.putExtra("link", model.getParameters().getLink());
+            intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
     }
