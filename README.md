@@ -18,9 +18,9 @@ Then put this lines in your module-level build.gradle:
 ```
 implementation 'com.google.code.gson:gson:2.8.2'
 implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+implementation 'com.squareup.okhttp3:okhttp:3.12.0'
 implementation 'com.coolerfall:android-http-download-manager:1.6.1'
-implementation 'com.github.ayantech:VersionControl:0.2.10'
+implementation 'com.github.ayantech:VersionControl:0.4.2'
 ```
 
 # Checking for new versions
