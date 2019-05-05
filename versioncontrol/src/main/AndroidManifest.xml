@@ -13,7 +13,8 @@
     <application>
         <activity
             android:name=".VersionControlActivity"
-            android:theme="@style/DialogActivity" />
+            android:theme="@style/DialogActivity"
+            android:launchMode="singleInstance"/>
         <provider
             android:name=".MyFileProvider"
             android:authorities="${applicationId}.provider"
