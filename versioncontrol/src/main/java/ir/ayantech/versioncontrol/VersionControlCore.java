@@ -2,8 +2,9 @@ package ir.ayantech.versioncontrol;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.util.Log;
@@ -17,30 +18,40 @@ import ir.ayantech.versioncontrol.api.VersionControlAPIs;
 import ir.ayantech.versioncontrol.model.ExtraInfoModel;
 import ir.ayantech.versioncontrol.model.VCResponseModel;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
 /**
  * Created by Administrator on 11/5/2017.
  */
 
-public class VersionControlCore implements VCResponseStatus {
+public class VersionControlCore {
 
-    private Context context;
-    private String ApplicationName;
-    private String ApplicationType;
-    private String ApplicationVersion;
-    private String CategoryName;
-    private ExtraInfoModel ExtraInfo;
+    private static VersionControlCore versionControlCoreInstance;
 
-    public VersionControlCore(Context context) {
-        this.context = context;
-        initializeApplicationType();
-        initializeApplicationName();
-        initializeApplicationVersion(this.context);
+    private String ApplicationName = null;
+    private String ApplicationType = null;
+    private String ApplicationVersion = null;
+    private String CategoryName = null;
+    private ExtraInfoModel ExtraInfo = null;
+    private Typeface typeface = null;
+
+    public static VersionControlCore getInstance() {
+        if (versionControlCoreInstance == null)
+            versionControlCoreInstance = new VersionControlCore();
+        return versionControlCoreInstance;
+    }
+
+    private VersionControlCore() {
         VersionControlAPIs.initialize();
     }
 
-    private void initializeApplicationName() {
+    private void initializeProperties(Context context) {
+        initializeApplicationType();
+        initializeApplicationName(context);
+        initializeApplicationVersion(context);
+    }
+
+    private void initializeApplicationName(Context context) {
+        if (ApplicationName != null)
+            return;
         try {
             this.ApplicationName = context.getPackageName().split("\\.")[2];
         } catch (Exception e) {
@@ -49,11 +60,13 @@ public class VersionControlCore implements VCResponseStatus {
     }
 
     private void initializeApplicationVersion(Context context) {
-        this.setApplicationVersion(getApplicationVersion(context));
+        if (ApplicationVersion == null)
+            this.setApplicationVersion(getApplicationVersion(context));
     }
 
     private void initializeApplicationType() {
-        setApplicationType("android");
+        if (ApplicationType == null)
+            setApplicationType("android");
     }
 
     public static String getApplicationVersion(Context context) {
@@ -90,44 +103,52 @@ public class VersionControlCore implements VCResponseStatus {
         return this;
     }
 
-    public VersionControlCore checkForNewVersion() {
-        VersionControlAPIs.checkVersion.callApi(this,
-                new CheckVersion.CheckVersionInputModel(ApplicationName, ApplicationType, CategoryName, ApplicationVersion, ExtraInfo));
+    public VersionControlCore setTypeface(Typeface typeface) {
+        this.typeface = typeface;
         return this;
     }
 
-    @Override
-    public void onSuccess(VersionControlAPI versionControlAPI, String message, @Nullable VCResponseModel responseModel) {
-        if (versionControlAPI instanceof CheckVersion) {
-            CheckVersion.CheckVersionResponse response = ((CheckVersion.CheckVersionResponse) responseModel);
-            if (response.getParameters().getUpdateStatus().contentEquals(CheckVersion.UpdateStatus.NOT_REQUIRED))
-                return;
-            VersionControlAPIs.getLastVersion.callApi(this,
-                    new GetLastVersion.GetLastVersionInputModel(ApplicationName, ApplicationType, CategoryName, getApplicationVersion(context), ExtraInfo));
-        } else if (versionControlAPI instanceof GetLastVersion) {
-            GetLastVersion.GetLastVersionResponseModel model = (GetLastVersion.GetLastVersionResponseModel) responseModel;
-            Intent intent = new Intent(context, VersionControlActivity.class);
-            intent.putExtra("title", model.getParameters().getTitle());
-            intent.putExtra("message", model.getParameters().getBody());
-            intent.putStringArrayListExtra("change_logs", model.getParameters().getChangeLogs());
-            intent.putExtra("pos_btn", model.getParameters().getAcceptButtonText());
-            intent.putExtra("neg_btn", model.getParameters().getRejectButtonText());
-            intent.putExtra("update_status", VersionControlAPIs.checkVersion.getResponse().getParameters().getUpdateStatus());
-            intent.putExtra("link_type", model.getParameters().getLinkType());
-            intent.putExtra("link", model.getParameters().getLink());
-            intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+    public void checkForNewVersion(final Activity activity) {
+        initializeProperties(activity);
+        VersionControlAPIs.checkVersion
+                .callApi(new VCResponseStatus() {
+                             @Override
+                             public void onSuccess(VersionControlAPI versionControlAPI, String message, @Nullable VCResponseModel responseModel) {
+                                 if (versionControlAPI instanceof CheckVersion) {
+                                     CheckVersion.CheckVersionResponse response = ((CheckVersion.CheckVersionResponse) responseModel);
+                                     if (response.getParameters().getUpdateStatus().contentEquals(CheckVersion.UpdateStatus.NOT_REQUIRED))
+                                         return;
+                                     VersionControlAPIs.getLastVersion.callApi(this,
+                                             new GetLastVersion.GetLastVersionInputModel(ApplicationName, ApplicationType, CategoryName, getApplicationVersion(activity), ExtraInfo));
+                                 } else if (versionControlAPI instanceof GetLastVersion) {
+                                     GetLastVersion.GetLastVersionResponseModel model = (GetLastVersion.GetLastVersionResponseModel) responseModel;
+                                     new VersionControlDialog(activity,
+                                             model.getParameters().getTitle(),
+                                             model.getParameters().getBody(),
+                                             model.getParameters().getAcceptButtonText(),
+                                             model.getParameters().getRejectButtonText(),
+                                             model.getParameters().getChangeLogs(),
+                                             model.getParameters().getLinkType(),
+                                             model.getParameters().getLink(),
+                                             VersionControlAPIs.checkVersion.getResponse().getParameters().getUpdateStatus(),
+                                             typeface).show();
+                                 }
+                             }
+
+                             @Override
+                             public void onFail(VersionControlAPI versionControlAPI, String error, boolean canTry) {
+
+                             }
+                         },
+                        new CheckVersion.CheckVersionInputModel(ApplicationName, ApplicationType, CategoryName, ApplicationVersion, ExtraInfo));
     }
 
-    @Override
-    public void onFail(VersionControlAPI versionControlAPI, String error, boolean canTry) {
-
-    }
-
-    public void shareApp() {
+    public void shareApp(final Context context) {
+        initializeProperties(context);
         if (VersionControlAPIs.getLastVersion.getResponse() != null) {
-            share(context, VersionControlAPIs.getLastVersion.getResponse().getParameters().getTextToShare());
+            try {
+                share(context, VersionControlAPIs.getLastVersion.getResponse().getParameters().getTextToShare());
+            } catch (Exception e) {}
         } else {
             VersionControlAPIs.getLastVersion.callApi(new VCResponseStatus() {
                 @Override

@@ -1,5 +1,6 @@
 package ir.ayantech.testcases;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +9,6 @@ import android.view.View;
 import ir.ayantech.versioncontrol.VersionControlCore;
 
 public class TestcaseListActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private VersionControlCore versionControlCore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +27,7 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
         findViewById(R.id.shareBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (versionControlCore != null)
-                    versionControlCore.shareApp();
+                VersionControlCore.getInstance().shareApp(TestcaseListActivity.this);
             }
         });
     }
@@ -73,11 +71,11 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
         return "testcase" + testcaseNumber;
     }
 
-    private VersionControlCore runVersionControlTestcase(String testcaseName) {
-        versionControlCore = new VersionControlCore(this)
+    private void runVersionControlTestcase(String testcaseName) {
+        VersionControlCore.getInstance()
                 .setApplicationName(testcaseName)
                 .setCategoryName("cafebazar")
-                .checkForNewVersion();
-        return versionControlCore;
+                .setTypeface(Typeface.createFromAsset(getAssets(), "fonts/iransans-ultralight.ttf"))
+                .checkForNewVersion(this);
     }
 }
