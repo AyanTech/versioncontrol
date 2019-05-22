@@ -35,7 +35,6 @@ You can customize more properties with relevant setter methods. You can find som
 Then anywhere in your app, when you want to check for updates:
 ```
 VersionControlCore.getInstance().checkForNewVersion({yourActivity});
-
 ```
 * Attention: You have to pass Activity context to this method.
 
