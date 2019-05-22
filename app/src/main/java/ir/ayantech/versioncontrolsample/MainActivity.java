@@ -1,25 +1,30 @@
 package ir.ayantech.versioncontrolsample;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import ir.ayantech.versioncontrol.VersionControlCore;
 
 public class MainActivity extends AppCompatActivity {
 
-    private VersionControlCore versionControlCore;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        versionControlCore = new VersionControlCore(this)
+        VersionControlCore.getInstance()
                 .setApplicationName(getApplicationName())
                 .setApplicationType(getApplicationType())
                 .setCategoryName("CafeBazar")
-                .checkForNewVersion();
+                .checkForNewVersion(this);
+
+        findViewById(R.id.shareAppBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareApp();
+            }
+        });
     }
 
     public String getApplicationName() {
@@ -31,6 +36,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void shareApp() {
-        versionControlCore.shareApp();
+        VersionControlCore.getInstance().shareApp(this);
     }
 }

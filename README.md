@@ -20,16 +20,29 @@ implementation 'com.google.code.gson:gson:2.8.2'
 implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 implementation 'com.squareup.okhttp3:okhttp:3.12.0'
 implementation 'com.coolerfall:android-http-download-manager:1.6.1'
-implementation 'com.github.ayantech:VersionControl:0.4.2'
+implementation 'com.github.ayantech:VersionControl:0.5.0'
 ```
 
 # Checking for new versions
 
-Anywhere in your app, when you want to check for updates:
+You have to initialize VersionControlCore class with proper values. So, it is recommended to do it like this in your application class:
 ```
-new VersionControlCore({yourActivity})
-                .setCategoryName({applicationCategory})
-                .checkForNewVersion();
+VersionControlCore.getInstance().setCategoryName({applicationCategory})
+```
+
+You can customize more properties with relevant setter methods. You can find some of them in the example applications.
+
+Then anywhere in your app, when you want to check for updates:
+```
+VersionControlCore.getInstance().checkForNewVersion({yourActivity});
+
+* Attention: You have to pass Activity context to this method.
+```
+
+# Share the app
+Anywhere in your app, when you want to share it:
+```
+VersionControlCore.getInstance().shareApp({yourContext});
 ```
 
 If you have to send ExtraInfo object (optional due to your project):
@@ -45,12 +58,11 @@ public class AppExtraInfo extends ExtraInfoModel {
 }
 ```
 
-And checking for new version code will be like this:
+And initializing will be like this:
 ```
-new VersionControlCore({yourActivity})
+VersionControlCore.getInstance()
                 .setCategoryName({applicationCategory})
                 .setExtraInfo(new AppExtraInfo())
-                .checkForNewVersion();
 ```
 
 # Proguard rules:
