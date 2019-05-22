@@ -36,8 +36,8 @@ Then anywhere in your app, when you want to check for updates:
 ```
 VersionControlCore.getInstance().checkForNewVersion({yourActivity});
 
-* Attention: You have to pass Activity context to this method.
 ```
+* Attention: You have to pass Activity context to this method.
 
 # Share the app
 Anywhere in your app, when you want to share it:
