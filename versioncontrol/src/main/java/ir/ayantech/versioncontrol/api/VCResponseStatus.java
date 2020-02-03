@@ -1,6 +1,6 @@
 package ir.ayantech.versioncontrol.api;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import ir.ayantech.versioncontrol.model.VCResponseModel;
 
