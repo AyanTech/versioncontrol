@@ -15,7 +15,7 @@ public class VersionControlClient {
 
     private static Retrofit retrofit = null;
 
-    private static final String VERSION_CONTROL_BASE_URL = "http://versioncontrol.infra.ayantech.ir/WebServices/App.svc/";
+    private static final String VERSION_CONTROL_BASE_URL = "https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/";
 
     private static OkHttpClient okHttpClient;
 
