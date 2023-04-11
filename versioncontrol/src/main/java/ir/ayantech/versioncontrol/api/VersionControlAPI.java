@@ -114,8 +114,6 @@ public abstract class VersionControlAPI<Request extends VCInputModel, ResponseMo
         }
 
         public void call() {
-            if (inputModel != null)
-                Log.d("Request", new VCRequestModel(inputModel).toString());
             isRunning = true;
             getResponseModelCall().clone().enqueue(this);
         }
@@ -127,7 +125,6 @@ public abstract class VersionControlAPI<Request extends VCInputModel, ResponseMo
                 isRunning = false;
                 responseModel = response.body();
                 if (responseModel != null) {
-                    Log.d("Response", responseModel.toString());
                     handleCallback(responseModel);
                     if (!wrappedRequests.isEmpty())
                         resumeCalls();

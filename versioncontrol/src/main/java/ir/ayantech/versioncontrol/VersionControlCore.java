@@ -55,7 +55,6 @@ public class VersionControlCore {
         try {
             this.ApplicationName = context.getPackageName().split("\\.")[2];
         } catch (Exception e) {
-            Log.e("AyanVC:", "Package name is not well formatted.");
         }
     }
 

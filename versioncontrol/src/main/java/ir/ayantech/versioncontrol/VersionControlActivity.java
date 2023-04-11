@@ -146,7 +146,6 @@ public class VersionControlActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onFailure(int downloadId, int statusCode, String errMsg) {
-                                        Log.e("AyanVC:", errMsg);
                                         finish();
                                         openUrl(VersionControlActivity.this, getVCLink());
                                     }

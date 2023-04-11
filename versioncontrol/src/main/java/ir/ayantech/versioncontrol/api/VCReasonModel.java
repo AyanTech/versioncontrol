@@ -61,7 +61,6 @@ public abstract class VCReasonModel {
             return response.body();
         } else {
             String error = response.errorBody().string();
-            Log.e("ERROR: ", error);
             return convertJsonStringToObject(error, tClass);
         }
     }

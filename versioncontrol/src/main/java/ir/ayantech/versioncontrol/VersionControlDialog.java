@@ -121,7 +121,6 @@ public class VersionControlDialog extends Dialog {
 
                                     @Override
                                     public void onFailure(int downloadId, int statusCode, String errMsg) {
-                                        Log.e("AyanVC:", errMsg);
                                         dismiss();
                                         openUrl(getContext(), link);
                                     }
