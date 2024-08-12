@@ -27,7 +27,7 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
         findViewById(R.id.shareBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                VersionControlCore.getInstance().shareApp(TestcaseListActivity.this);
+                VersionControlCore.getInstance("https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/").shareApp(TestcaseListActivity.this);
             }
         });
     }
@@ -72,9 +72,9 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void runVersionControlTestcase(String testcaseName) {
-        VersionControlCore.getInstance()
+        VersionControlCore.getInstance("https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/")
                 .setApplicationName(testcaseName)
-                .setCategoryName("cafebazar")
+                .setCategoryName("cafebazaar")
                 .setTypeface(Typeface.createFromAsset(getAssets(), "fonts/iransans-ultralight.ttf"))
                 .checkForNewVersion(this);
     }

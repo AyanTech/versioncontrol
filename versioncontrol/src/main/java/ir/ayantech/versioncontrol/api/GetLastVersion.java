@@ -1,5 +1,7 @@
 package ir.ayantech.versioncontrol.api;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +18,16 @@ import retrofit2.Call;
 
 public class GetLastVersion extends VersionControlAPI<GetLastVersion.GetLastVersionInputModel, GetLastVersion.GetLastVersionResponseModel> {
 
+    @Nullable
+    String BaseUrl;
+
+    public GetLastVersion(@Nullable String baseUrl) {
+        this.BaseUrl = baseUrl;
+    }
+
     @Override
     protected Call<GetLastVersionResponseModel> getApi(GetLastVersionInputModel inputModel) {
-        return getApiService().getLastVersion(new VCRequestModel(inputModel));
+        return getApiService(BaseUrl).getLastVersion(new VCRequestModel(inputModel));
     }
 
     public static class GetLastVersionInputModel extends VCInputModel {

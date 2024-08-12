@@ -1,5 +1,7 @@
 package ir.ayantech.versioncontrol.api;
 
+import androidx.annotation.Nullable;
+
 import ir.ayantech.versioncontrol.model.ExtraInfoModel;
 import ir.ayantech.versioncontrol.model.VCInputModel;
 import ir.ayantech.versioncontrol.model.VCRequestModel;
@@ -13,9 +15,16 @@ import retrofit2.Call;
 
 public class CheckVersion extends VersionControlAPI<CheckVersion.CheckVersionInputModel, CheckVersion.CheckVersionResponse> {
 
+    @Nullable
+    String BaseUrl;
+
+    public CheckVersion(@Nullable String baseUrl) {
+        this.BaseUrl = baseUrl;
+    }
+
     @Override
     protected Call<CheckVersionResponse> getApi(CheckVersionInputModel inputModel) {
-        return getApiService().checkVersion(new VCRequestModel(inputModel));
+        return getApiService(BaseUrl).checkVersion(new VCRequestModel(inputModel));
     }
 
 

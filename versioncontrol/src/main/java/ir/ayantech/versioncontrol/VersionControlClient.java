@@ -1,5 +1,7 @@
 package ir.ayantech.versioncontrol;
 
+import androidx.annotation.Nullable;
+
 import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +17,7 @@ public class VersionControlClient {
 
     private static Retrofit retrofit = null;
 
-    private static final String VERSION_CONTROL_BASE_URL = "https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/";
+    private static String VERSION_CONTROL_BASE_URL = "https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/";
 
     private static OkHttpClient okHttpClient;
 
@@ -31,11 +33,11 @@ public class VersionControlClient {
         return okHttpClient;
     }
 
-    public static Retrofit getClient() {
+    public static Retrofit getClient(@Nullable String baseUrl) {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .client(getOkHttpClient())
-                    .baseUrl(VERSION_CONTROL_BASE_URL)
+                    .baseUrl((baseUrl == null) ? VERSION_CONTROL_BASE_URL : baseUrl)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

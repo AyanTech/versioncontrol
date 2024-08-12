@@ -26,6 +26,7 @@ public class VersionControlCore {
 
     private static VersionControlCore versionControlCoreInstance;
 
+    private static String BaseUrl = null;
     private String ApplicationName = null;
     private String ApplicationType = null;
     private String ApplicationVersion = null;
@@ -33,14 +34,23 @@ public class VersionControlCore {
     private ExtraInfoModel ExtraInfo = null;
     private Typeface typeface = null;
 
+    @Deprecated()
     public static VersionControlCore getInstance() {
         if (versionControlCoreInstance == null)
             versionControlCoreInstance = new VersionControlCore();
         return versionControlCoreInstance;
     }
 
+    public static VersionControlCore getInstance(@Nullable String baseUrl) {
+        if (versionControlCoreInstance == null) {
+            BaseUrl = baseUrl;
+            versionControlCoreInstance = new VersionControlCore();
+        }
+        return versionControlCoreInstance;
+    }
+
     private VersionControlCore() {
-        VersionControlAPIs.initialize();
+        VersionControlAPIs.initialize(BaseUrl);
     }
 
     private void initializeProperties(Context context) {

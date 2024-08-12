@@ -2,6 +2,8 @@ package ir.ayantech.versioncontrol.api;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +29,9 @@ public abstract class VersionControlAPI<Request extends VCInputModel, ResponseMo
     private boolean isRunning;
     private List<WrappedRequest> wrappedRequests;
 
-    public static VersionControlInterface getApiService() {
+    public static VersionControlInterface getApiService(@Nullable String baseUrl) {
         if (apiService == null)
-            apiService = VersionControlClient.getClient().create(VersionControlInterface.class);
+            apiService = VersionControlClient.getClient(baseUrl).create(VersionControlInterface.class);
         return apiService;
     }
 
