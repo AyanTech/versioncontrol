@@ -10,7 +10,7 @@
 
     <application>
         <activity
-            android:name=".VersionControlActivity"
+            android:name=".ui.VersionControlActivity"
             android:theme="@style/DialogActivity"
             android:launchMode="singleInstance"
             android:exported="false"/>

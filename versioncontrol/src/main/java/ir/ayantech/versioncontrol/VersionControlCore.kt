@@ -6,16 +6,18 @@ import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.widget.Toast
 import androidx.core.app.ShareCompat
-import ir.ayantech.versioncontrol.api.CheckVersion
-import ir.ayantech.versioncontrol.api.GetLastVersion
-import ir.ayantech.versioncontrol.api.VCResponseStatus
-import ir.ayantech.versioncontrol.api.VersionControlAPI
-import ir.ayantech.versioncontrol.api.VersionControlAPIs
+import ir.ayantech.versioncontrol.domain.model.VersionCheckResult
 import ir.ayantech.versioncontrol.model.ExtraInfoModel
-import ir.ayantech.versioncontrol.model.VCResponseModel
+import ir.ayantech.versioncontrol.ui.VersionControlDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class VersionControlCore private constructor() {
-
+class VersionControlCore private constructor(
+    private var baseUrl: String
+) {
     private var applicationName: String? = null
     private var applicationType: String? = null
     private var applicationVersion: String? = null
@@ -23,66 +25,44 @@ class VersionControlCore private constructor() {
     private var extraInfo: ExtraInfoModel? = null
     private var typeface: Typeface? = null
 
+    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
     companion object {
-        private var versionControlCoreInstance: VersionControlCore? = null
-        private var baseUrl: String? = null
+        @Volatile
+        private var instance: VersionControlCore? = null
 
         @JvmStatic
-        @Deprecated("Use getInstance(baseUrl) instead")
-        fun getInstance(): VersionControlCore {
-            if (versionControlCoreInstance == null) {
-                versionControlCoreInstance = VersionControlCore()
+        fun getInstance(baseUrl: String): VersionControlCore {
+            require(baseUrl.isNotBlank()) { "Base URL must be provided by the application." }
+            return (instance ?: synchronized(this) {
+                instance ?: VersionControlCore(baseUrl).also { instance = it }
+            }).apply {
+                this.baseUrl = baseUrl
             }
-            return versionControlCoreInstance!!
-        }
-
-        @JvmStatic
-        fun getInstance(baseUrl: String?): VersionControlCore {
-            if (versionControlCoreInstance == null) {
-                Companion.baseUrl = baseUrl
-                versionControlCoreInstance = VersionControlCore()
-            }
-            return versionControlCoreInstance!!
         }
 
         @JvmStatic
         fun getApplicationVersion(context: Context): String {
-            try {
-                return context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
+            return try {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+            } catch (_: PackageManager.NameNotFoundException) {
+                ""
             }
-            return ""
         }
-    }
-
-    init {
-        VersionControlAPIs.initialize(baseUrl)
     }
 
     private fun initializeProperties(context: Context) {
-        initializeApplicationType()
-        initializeApplicationName(context)
-        initializeApplicationVersion(context)
-    }
-
-    private fun initializeApplicationName(context: Context) {
-        if (applicationName != null) return
-        try {
-            applicationName = context.packageName.split(".")[2]
-        } catch (_: Exception) {
-        }
-    }
-
-    private fun initializeApplicationVersion(context: Context) {
-        if (applicationVersion == null) {
-            setApplicationVersion(getApplicationVersion(context))
-        }
-    }
-
-    private fun initializeApplicationType() {
         if (applicationType == null) {
-            setApplicationType("android")
+            applicationType = VersionControlConfig.DEFAULT_APPLICATION_TYPE
+        }
+        if (applicationName == null) {
+            try {
+                applicationName = context.packageName.split(".")[2]
+            } catch (_: Exception) {
+            }
+        }
+        if (applicationVersion == null) {
+            applicationVersion = getApplicationVersion(context)
         }
     }
 
@@ -116,115 +96,70 @@ class VersionControlCore private constructor() {
         return this
     }
 
+    private fun buildConfig(): VersionControlConfig {
+        require(baseUrl.isNotBlank()) { "Base URL must be provided by the application." }
+        return VersionControlConfig(
+            baseUrl = baseUrl,
+            applicationName = applicationName,
+            applicationType = applicationType ?: VersionControlConfig.DEFAULT_APPLICATION_TYPE,
+            categoryName = categoryName,
+            applicationVersion = applicationVersion,
+            extraInfo = extraInfo,
+            typeface = typeface
+        )
+    }
+
     fun checkForNewVersion(activity: Activity) {
         initializeProperties(activity)
-        val checkVersionApi = VersionControlAPIs.checkVersion ?: return
-        checkVersionApi.callApi(
-            object : VCResponseStatus {
-                override fun onSuccess(
-                    versionControlAPI: VersionControlAPI<*, *>?,
-                    message: String?,
-                    responseModel: VCResponseModel?
-                ) {
-                    if (versionControlAPI is CheckVersion) {
-                        val response = responseModel as? CheckVersion.CheckVersionResponse
-                        if (response?.parameters?.updateStatus == CheckVersion.UpdateStatus.NOT_REQUIRED) {
-                            return
-                        }
-                        VersionControlAPIs.getLastVersion?.callApi(
-                            this,
-                            GetLastVersion.GetLastVersionInputModel(
-                                applicationName,
-                                applicationType,
-                                categoryName,
-                                getApplicationVersion(activity),
-                                extraInfo
-                            )
-                        )
-                    } else if (versionControlAPI is GetLastVersion) {
-                        val model = responseModel as? GetLastVersion.GetLastVersionResponseModel
-                        val params = model?.parameters
-                        VersionControlDialog(
-                            activity,
-                            params?.title,
-                            params?.body,
-                            params?.acceptButtonText,
-                            params?.rejectButtonText,
-                            params?.changeLogs,
-                            params?.linkType,
-                            params?.link,
-                            VersionControlAPIs.checkVersion?.response?.parameters?.updateStatus,
-                            typeface
-                        ).show()
-                    }
-                }
+        val config = buildConfig()
+        val versionControl = VersionControl.create(activity)
 
-                override fun onFail(
-                    versionControlAPI: VersionControlAPI<*, *>?,
-                    error: String?,
-                    canTry: Boolean
-                ) {
+        mainScope.launch {
+            val result = versionControl.checkForNewVersion(config)
+            if (result is VersionCheckResult.UpdateAvailable) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    VersionControlDialog(
+                        activity = activity,
+                        updateInfo = result.updateInfo,
+                        typeface = typeface,
+                        versionControl = versionControl
+                    ).show()
                 }
-            },
-            CheckVersion.CheckVersionInputModel(
-                applicationName,
-                applicationType,
-                categoryName,
-                applicationVersion,
-                extraInfo
-            )
-        )
+            }
+        }
     }
 
     fun shareApp(context: Context) {
         initializeProperties(context)
-        val getLastVersionResponse = VersionControlAPIs.getLastVersion?.response
-        if (getLastVersionResponse != null) {
-            try {
-                share(context, getLastVersionResponse.parameters?.textToShare)
-            } catch (_: Exception) {
-            }
-        } else {
-            VersionControlAPIs.getLastVersion?.callApi(
-                object : VCResponseStatus {
-                    override fun onSuccess(
-                        versionControlAPI: VersionControlAPI<*, *>?,
-                        message: String?,
-                        responseModel: VCResponseModel?
-                    ) {
-                        val shareText = VersionControlAPIs.getLastVersion?.response?.parameters?.textToShare
-                        share(context, shareText)
-                    }
+        val config = buildConfig()
+        val versionControl = VersionControl.create(context)
 
-                    override fun onFail(
-                        versionControlAPI: VersionControlAPI<*, *>?,
-                        error: String?,
-                        canTry: Boolean
-                    ) {
+        mainScope.launch {
+            val shareResult = versionControl.shareApp(config)
+            shareResult.fold(
+                onSuccess = { shareText ->
+                    share(context, shareText)
+                },
+                onFailure = {
+                    withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            "لطفا اتصال اینترنت خود را بررسی کرده و دوباره تلاش نمایید.",
+                            context.getString(R.string.vc_check_internet_connection),
                             Toast.LENGTH_LONG
                         ).show()
                     }
-                },
-                GetLastVersion.GetLastVersionInputModel(
-                    applicationName,
-                    applicationType,
-                    categoryName,
-                    getApplicationVersion(context),
-                    extraInfo
-                )
+                }
             )
         }
     }
 
     private fun share(context: Context, shareBody: String?) {
+        if (shareBody.isNullOrEmpty()) return
         if (context is Activity) {
             ShareCompat.IntentBuilder(context)
                 .setText(shareBody)
                 .setType("text/plain")
-                .setChooserTitle("به اشتراک گذاری از طریق:")
+                .setChooserTitle(context.getString(R.string.vc_share_via))
                 .startChooser()
         }
     }

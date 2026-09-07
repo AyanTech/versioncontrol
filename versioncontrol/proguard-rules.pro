@@ -20,3 +20,9 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep public class ir.ayantech.versioncontrol.** { *; }
+-keep class ir.ayantech.versioncontrol.data.remote.dto.** { *; }
+-keep class ir.ayantech.versioncontrol.model.** { *; }
+-keep class ir.ayantech.versioncontrol.domain.model.** { *; }
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}

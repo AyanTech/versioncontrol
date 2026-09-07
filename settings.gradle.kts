@@ -16,6 +16,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "versioncontrol"
-include(":app")
+include(":sample")
 include(":versioncontrol")
-include(":testcases")

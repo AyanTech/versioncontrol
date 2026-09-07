@@ -30,6 +30,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -53,8 +57,14 @@ publishing {
 
 dependencies {
     implementation(libs.androidx.appcompat)
-    compileOnly(libs.gson)
-    compileOnly(libs.retrofit.converter.gson)
-    compileOnly(libs.okhttp)
-    compileOnly(libs.android.http.download.manager)
+    api(libs.gson)
+    api(libs.okhttp)
+    api(libs.android.http.download.manager)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.coroutines.android)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
 }

@@ -1,17 +1,27 @@
 [versions]
 agp = "9.3.0"
 appcompat = "1.7.0"
-gson = "2.10.1"
-retrofit = "2.11.0"
-okhttp = "4.12.0"
+gson = "2.14.0"
+okhttp = "5.0.0"
 androidHttpDownloadManager = "1.6.1"
+coroutines = "1.11.0"
+junit = "4.13.2"
+mockk = "1.14.11"
+turbine = "1.2.1"
+material = "1.11.0"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 android-http-download-manager = { group = "com.coolerfall", name = "android-http-download-manager", version.ref = "androidHttpDownloadManager" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
