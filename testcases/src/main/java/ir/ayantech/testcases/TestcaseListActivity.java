@@ -2,8 +2,10 @@ package ir.ayantech.testcases;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 
 import ir.ayantech.versioncontrol.VersionControlCore;
@@ -42,26 +44,17 @@ public class TestcaseListActivity extends AppCompatActivity implements View.OnCl
     @NonNull
     private Integer getTestcaseNumber(View v) {
         int testcaseNumber = 0;
-        switch (v.getId()) {
-            case R.id.testcase1Button:
-                testcaseNumber = 1;
-                break;
-
-            case R.id.testcase2Button:
-                testcaseNumber = 2;
-                break;
-
-            case R.id.testcase3Button:
-                testcaseNumber = 3;
-                break;
-
-            case R.id.testcase4Button:
-                testcaseNumber = 4;
-                break;
-
-            case R.id.testcase5Button:
-                testcaseNumber = 5;
-                break;
+        int id = v.getId();
+        if (id == R.id.testcase1Button) {
+            testcaseNumber = 1;
+        } else if (id == R.id.testcase2Button) {
+            testcaseNumber = 2;
+        } else if (id == R.id.testcase3Button) {
+            testcaseNumber = 3;
+        } else if (id == R.id.testcase4Button) {
+            testcaseNumber = 4;
+        } else if (id == R.id.testcase5Button) {
+            testcaseNumber = 5;
         }
         return testcaseNumber;
     }

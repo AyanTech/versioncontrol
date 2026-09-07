@@ -1,0 +1,18 @@
+[versions]
+agp = "9.3.0"
+appcompat = "1.7.0"
+gson = "2.10.1"
+retrofit = "2.11.0"
+okhttp = "4.12.0"
+androidHttpDownloadManager = "1.6.1"
+
+[libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+android-http-download-manager = { group = "com.coolerfall", name = "android-http-download-manager", version.ref = "androidHttpDownloadManager" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
