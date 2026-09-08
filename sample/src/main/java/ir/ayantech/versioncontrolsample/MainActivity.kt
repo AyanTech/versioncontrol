@@ -17,7 +17,9 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
-    private val baseUrl = "https://versioncontrol.infra.ayantech.ir/WebServices/App.svc/"
+    private val baseUrl = "MY_BASE_URL"
+    private val iranColocationBaseUrl = "MY_BASE_URL"
+    private val internationalColocationBaseUrl = "MY_BASE_URL"
     private val applicationName = "testcase2"
     private val market = "cafebazaar"
 
@@ -38,6 +40,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         findViewById<Button>(R.id.getLastVersionBtn)?.setOnClickListener {
             testGetLastVersion()
+        }
+
+        findViewById<Button>(R.id.getColocationConfigBtn)?.setOnClickListener {
+            testGetColocationConfig()
         }
     }
 
@@ -121,6 +127,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(
                         this@MainActivity,
                         "Error: ${error.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+        }
+    }
+
+    private fun testGetColocationConfig() {
+        val appVersion = VersionControlCore.getApplicationVersion(this)
+
+        lifecycleScope.launch {
+            val result = VersionControlCore.getInstance(baseUrl)
+                .setIranBaseUrl(iranColocationBaseUrl)
+                .setInternationalBaseUrl(internationalColocationBaseUrl)
+                .setApplicationName(applicationName)
+                .setApplicationType(getApplicationType())
+                .setApplicationVersion(appVersion)
+                .getApplicationColocationConfig(this@MainActivity)
+
+            result.fold(
+                onSuccess = { colocationResult ->
+                    val endpointsSummary = colocationResult.endpointList.joinToString("\n") {
+                        "${it.name}: ${it.url}"
+                    }
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Lane: ${colocationResult.versionControlBaseUrl}\nEndpoints:\n$endpointsSummary",
+                        Toast.LENGTH_LONG
+                    ).show()
+                },
+                onFailure = { error ->
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Colocation error: ${error.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }

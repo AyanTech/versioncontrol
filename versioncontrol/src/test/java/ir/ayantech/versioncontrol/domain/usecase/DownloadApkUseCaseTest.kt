@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import ir.ayantech.versioncontrol.domain.model.DownloadState
 import ir.ayantech.versioncontrol.domain.repository.VersionControlRepository
+import ir.ayantech.versioncontrol.domain.usecase.impl.DownloadApkUseCaseImpl
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -13,7 +14,7 @@ import org.junit.Test
 class DownloadApkUseCaseTest {
 
     private val repository: VersionControlRepository = mockk()
-    private val downloadApkUseCase = DownloadApkUseCase(repository)
+    private val downloadApkUseCase: DownloadApkUseCase = DownloadApkUseCaseImpl(repository)
 
     @Test
     fun `invoke delegates download flow to repository`() = runTest {

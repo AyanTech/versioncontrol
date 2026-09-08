@@ -8,4 +8,5 @@
     <string name="testcase5">test with (mandatory, direct)</string>
     <string name="share_app">Share app</string>
     <string name="get_last_version">Get last version</string>
+    <string name="get_colocation_config">Get Colocation Config</string>
 </resources>

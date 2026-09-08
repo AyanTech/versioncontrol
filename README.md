@@ -76,6 +76,32 @@ VersionControlCore.getInstance("BASE_URL")
     .shareApp(context)
 ```
 
+### 4. Resolve Colocation Endpoints
+
+The host application must provide both colocation service URLs. The SDK first calls
+the Iran1 service and calls the International service only when Iran1 has a network/
+HTTP failure, returns a non-success status, or returns no usable endpoints.
+
+```kotlin
+lifecycleScope.launch {
+    val result = VersionControlCore.getInstance("DEFAULT_VERSION_CONTROL_BASE_URL")
+        .setIranBaseUrl("IRAN_1_COLOCATION_BASE_URL")
+        .setInternationalBaseUrl("INTERNATIONAL_COLOCATION_BASE_URL")
+        .setApplicationName("myApplicationName")
+        .setApplicationVersion(VersionControlCore.getApplicationVersion(this@MainActivity))
+        .getApplicationColocationConfig(this@MainActivity)
+
+    result.fold(
+        onSuccess = { config ->
+            // Use config.endpointList or config.versionControlBaseUrl.
+        },
+        onFailure = { error ->
+            // Both services failed; show or otherwise handle the final error.
+        }
+    )
+}
+```
+
 ---
 
 ## 🛡️ ProGuard / R8 Rules

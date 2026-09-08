@@ -2,6 +2,9 @@ package ir.ayantech.versioncontrol.data.mapper
 
 import ir.ayantech.versioncontrol.VersionControlConfig
 import ir.ayantech.versioncontrol.data.remote.dto.CheckVersionResponseDto
+import ir.ayantech.versioncontrol.data.remote.dto.EndpointDto
+import ir.ayantech.versioncontrol.data.remote.dto.GetApplicationColocationConfigParametersDto
+import ir.ayantech.versioncontrol.data.remote.dto.GetApplicationColocationConfigResponseDto
 import ir.ayantech.versioncontrol.data.remote.dto.GetLastVersionResponseDto
 import ir.ayantech.versioncontrol.domain.model.LinkType
 import ir.ayantech.versioncontrol.domain.model.UpdateStatus
@@ -102,5 +105,30 @@ class VersionControlMapperTest {
         assertTrue(isSuccessS)
         assertFalse(isError)
         assertFalse(isNullSuccess)
+    }
+
+    @Test
+    fun `toColocationEndpoints maps response DTO correctly filtering invalid entries`() {
+        // Arrange
+        val dto = GetApplicationColocationConfigResponseDto(
+            parameters = GetApplicationColocationConfigParametersDto(
+                endpointList = listOf(
+                    EndpointDto(name = "VersionControl", url = "https://example.com/xyz/"),
+                    EndpointDto(name = "CoreApi", upperUrl = "https://example.com/xyz/"),
+                    EndpointDto(name = "", url = "https://example.com/empty"),
+                    EndpointDto(name = "Invalid", url = null)
+                )
+            )
+        )
+
+        // Act
+        val endpoints = dto.toColocationEndpoints()
+
+        // Assert
+        assertEquals(2, endpoints.size)
+        assertEquals("VersionControl", endpoints[0].name)
+        assertEquals("https://example.com/xyz/", endpoints[0].url)
+        assertEquals("CoreApi", endpoints[1].name)
+        assertEquals("https://example.com/xyz/", endpoints[1].url)
     }
 }

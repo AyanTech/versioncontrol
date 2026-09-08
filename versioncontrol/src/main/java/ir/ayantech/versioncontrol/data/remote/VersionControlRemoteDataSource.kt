@@ -2,6 +2,8 @@ package ir.ayantech.versioncontrol.data.remote
 
 import ir.ayantech.versioncontrol.data.remote.dto.CheckVersionInputDto
 import ir.ayantech.versioncontrol.data.remote.dto.CheckVersionResponseDto
+import ir.ayantech.versioncontrol.data.remote.dto.GetApplicationColocationConfigInputDto
+import ir.ayantech.versioncontrol.data.remote.dto.GetApplicationColocationConfigResponseDto
 import ir.ayantech.versioncontrol.data.remote.dto.GetLastVersionInputDto
 import ir.ayantech.versioncontrol.data.remote.dto.GetLastVersionResponseDto
 import ir.ayantech.versioncontrol.data.remote.dto.VCRequestDto
@@ -16,4 +18,9 @@ interface VersionControlRemoteDataSource {
         baseUrl: String,
         request: VCRequestDto<GetLastVersionInputDto>
     ): GetLastVersionResponseDto
+
+    suspend fun getApplicationColocationConfig(
+        baseUrl: String,
+        request: VCRequestDto<GetApplicationColocationConfigInputDto>
+    ): GetApplicationColocationConfigResponseDto
 }

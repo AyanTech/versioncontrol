@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.widget.Toast
 import androidx.core.app.ShareCompat
+import ir.ayantech.versioncontrol.domain.model.ColocationConfigResult
 import ir.ayantech.versioncontrol.domain.model.VersionCheckResult
 import ir.ayantech.versioncontrol.model.ExtraInfoModel
 import ir.ayantech.versioncontrol.ui.VersionControlDialog
@@ -16,8 +17,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class VersionControlCore private constructor(
-    private var baseUrl: String
+    private val defaultBaseUrl: String
 ) {
+    private var baseUrl: String = defaultBaseUrl
+    private var iranBaseUrl: String? = null
+    private var internationalBaseUrl: String? = null
     private var applicationName: String? = null
     private var applicationType: String? = null
     private var applicationVersion: String? = null
@@ -71,6 +75,16 @@ class VersionControlCore private constructor(
         return this
     }
 
+    fun setIranBaseUrl(iranBaseUrl: String?): VersionControlCore {
+        this.iranBaseUrl = iranBaseUrl
+        return this
+    }
+
+    fun setInternationalBaseUrl(internationalBaseUrl: String?): VersionControlCore {
+        this.internationalBaseUrl = internationalBaseUrl
+        return this
+    }
+
     fun setApplicationType(applicationType: String?): VersionControlCore {
         this.applicationType = applicationType
         return this
@@ -100,6 +114,8 @@ class VersionControlCore private constructor(
         require(baseUrl.isNotBlank()) { "Base URL must be provided by the application." }
         return VersionControlConfig(
             baseUrl = baseUrl,
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl,
             applicationName = applicationName,
             applicationType = applicationType ?: VersionControlConfig.DEFAULT_APPLICATION_TYPE,
             categoryName = categoryName,
@@ -107,6 +123,72 @@ class VersionControlCore private constructor(
             extraInfo = extraInfo,
             typeface = typeface
         )
+    }
+
+    suspend fun getApplicationColocationConfig(
+        context: Context,
+        iranBaseUrl: String? = this.iranBaseUrl,
+        internationalBaseUrl: String? = this.internationalBaseUrl
+    ): Result<ColocationConfigResult> {
+        initializeProperties(context)
+        val versionControl = VersionControl.create(context)
+        val appName = applicationName ?: ""
+        val appType = applicationType ?: VersionControlConfig.DEFAULT_APPLICATION_TYPE
+        val appVersion = applicationVersion ?: getApplicationVersion(context)
+        val resolvedIranBaseUrl = iranBaseUrl
+            ?.takeIf { it.isNotBlank() }
+            ?: return Result.failure(
+                IllegalArgumentException("Iran base URL must be provided by the application.")
+            )
+        val resolvedInternationalBaseUrl = internationalBaseUrl
+            ?.takeIf { it.isNotBlank() }
+            ?: return Result.failure(
+                IllegalArgumentException("International base URL must be provided by the application.")
+            )
+
+        val result = versionControl.getApplicationColocationConfig(
+            applicationName = appName,
+            applicationType = appType,
+            applicationVersion = appVersion,
+            iranBaseUrl = resolvedIranBaseUrl,
+            internationalBaseUrl = resolvedInternationalBaseUrl
+        )
+
+        result.fold(
+            onSuccess = { configResult ->
+                configResult.versionControlBaseUrl?.let { newUrl ->
+                    this.baseUrl = newUrl
+                }
+            },
+            onFailure = {
+                this.baseUrl = defaultBaseUrl
+            }
+        )
+        return result
+    }
+
+    fun getApplicationColocationConfig(
+        context: Context,
+        callback: (Result<ColocationConfigResult>) -> Unit
+    ) {
+        getApplicationColocationConfig(
+            context = context,
+            iranBaseUrl = this.iranBaseUrl,
+            internationalBaseUrl = this.internationalBaseUrl,
+            callback = callback
+        )
+    }
+
+    fun getApplicationColocationConfig(
+        context: Context,
+        iranBaseUrl: String?,
+        internationalBaseUrl: String?,
+        callback: (Result<ColocationConfigResult>) -> Unit
+    ) {
+        mainScope.launch {
+            val result = getApplicationColocationConfig(context, iranBaseUrl, internationalBaseUrl)
+            callback(result)
+        }
     }
 
     fun checkForNewVersion(activity: Activity) {

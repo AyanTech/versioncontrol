@@ -64,5 +64,13 @@
             android:layout_marginTop="8dp"
             android:text="@string/get_last_version" />
 
+        <Button
+            android:id="@+id/getColocationConfigBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/get_colocation_config" />
+
     </LinearLayout>
 </ScrollView>
