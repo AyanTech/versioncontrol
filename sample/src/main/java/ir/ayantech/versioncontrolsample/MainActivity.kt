@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val appVersion = VersionControlCore.getApplicationVersion(this)
 
-        VersionControlCore.getInstance(baseUrl)
+        VersionControlCore.getInstance(baseUrl, lifecycleScope)
             .setApplicationName(testcaseName)
             .setApplicationType(getApplicationType())
             .setCategoryName(market)
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun shareApp() {
-        VersionControlCore.getInstance(baseUrl)
+        VersionControlCore.getInstance(baseUrl, lifecycleScope)
             .setApplicationName(applicationName)
             .setApplicationType(getApplicationType())
             .setCategoryName(market)
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val appVersion = VersionControlCore.getApplicationVersion(this)
 
         lifecycleScope.launch {
-            val result = VersionControlCore.getInstance(baseUrl)
+            val result = VersionControlCore.getInstance(baseUrl, lifecycleScope)
                 .setIranBaseUrl(iranColocationBaseUrl)
                 .setInternationalBaseUrl(internationalColocationBaseUrl)
                 .setApplicationName(applicationName)

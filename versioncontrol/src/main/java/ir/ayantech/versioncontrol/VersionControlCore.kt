@@ -12,12 +12,12 @@ import ir.ayantech.versioncontrol.model.ExtraInfoModel
 import ir.ayantech.versioncontrol.ui.VersionControlDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class VersionControlCore private constructor(
-    private val defaultBaseUrl: String
+    private val defaultBaseUrl: String,
+    private val coroutineScope: CoroutineScope
 ) {
     private var baseUrl: String = defaultBaseUrl
     private var iranBaseUrl: String? = null
@@ -29,17 +29,15 @@ class VersionControlCore private constructor(
     private var extraInfo: ExtraInfoModel? = null
     private var typeface: Typeface? = null
 
-    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-
     companion object {
         @Volatile
         private var instance: VersionControlCore? = null
 
         @JvmStatic
-        fun getInstance(baseUrl: String): VersionControlCore {
+        fun getInstance(baseUrl: String, coroutineScope: CoroutineScope): VersionControlCore {
             require(baseUrl.isNotBlank()) { "Base URL must be provided by the application." }
             return (instance ?: synchronized(this) {
-                instance ?: VersionControlCore(baseUrl).also { instance = it }
+                instance ?: VersionControlCore(baseUrl, coroutineScope).also { instance = it }
             }).apply {
                 this.baseUrl = baseUrl
             }
@@ -185,53 +183,63 @@ class VersionControlCore private constructor(
         internationalBaseUrl: String?,
         callback: (Result<ColocationConfigResult>) -> Unit
     ) {
-        mainScope.launch {
+        coroutineScope.launch {
             val result = getApplicationColocationConfig(context, iranBaseUrl, internationalBaseUrl)
             callback(result)
         }
     }
 
-    fun checkForNewVersion(activity: Activity) {
+    suspend fun checkForNewVersionSuspend(activity: Activity): VersionCheckResult {
         initializeProperties(activity)
         val config = buildConfig()
         val versionControl = VersionControl.create(activity)
 
-        mainScope.launch {
-            val result = versionControl.checkForNewVersion(config)
-            if (result is VersionCheckResult.UpdateAvailable) {
-                if (!activity.isFinishing && !activity.isDestroyed) {
-                    VersionControlDialog(
-                        activity = activity,
-                        updateInfo = result.updateInfo,
-                        typeface = typeface,
-                        versionControl = versionControl
-                    ).show()
-                }
+        val result = versionControl.checkForNewVersion(config)
+        if (result is VersionCheckResult.UpdateAvailable) {
+            if (!activity.isFinishing && !activity.isDestroyed) {
+                VersionControlDialog(
+                    activity = activity,
+                    updateInfo = result.updateInfo,
+                    typeface = typeface,
+                    versionControl = versionControl
+                ).show()
             }
+        }
+        return result
+    }
+
+    fun checkForNewVersion(activity: Activity) {
+        coroutineScope.launch {
+            checkForNewVersionSuspend(activity)
         }
     }
 
-    fun shareApp(context: Context) {
+    suspend fun shareAppSuspend(context: Context): Result<String> {
         initializeProperties(context)
         val config = buildConfig()
         val versionControl = VersionControl.create(context)
 
-        mainScope.launch {
-            val shareResult = versionControl.shareApp(config)
-            shareResult.fold(
-                onSuccess = { shareText ->
-                    share(context, shareText)
-                },
-                onFailure = {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.vc_check_internet_connection),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+        val shareResult = versionControl.shareApp(config)
+        shareResult.fold(
+            onSuccess = { shareText ->
+                share(context, shareText)
+            },
+            onFailure = {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.vc_check_internet_connection),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            )
+            }
+        )
+        return shareResult
+    }
+
+    fun shareApp(context: Context) {
+        coroutineScope.launch {
+            shareAppSuspend(context)
         }
     }
 
