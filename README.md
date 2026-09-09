@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/AyanTech/OCR-SDK.svg)](https://jitpack.io/#AyanTech/OCR-SDK)
+[![](https://jitpack.io/v/AyanTech/versioncontrol.svg)](https://jitpack.io/#AyanTech/versioncontrol)
 
 # AyanTech Version Control SDK for Android
 
