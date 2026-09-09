@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VersionControlSample</string>
+    <string name="testcase1">test with (not-required)</string>
+    <string name="testcase2">test with (optional, page)</string>
+    <string name="testcase3">test with (mandatory, page)</string>
+    <string name="testcase4">test with (optional, direct)</string>
+    <string name="testcase5">test with (mandatory, direct)</string>
+    <string name="share_app">Share app</string>
+    <string name="get_last_version">Get last version</string>
+    <string name="get_colocation_config">Get Colocation Config</string>
+</resources>

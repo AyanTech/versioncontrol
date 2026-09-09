@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/vc_background">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/mainContentLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +38,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="%0"
             android:visibility="gone"
             android:textColor="@color/vc_black"/>
 
@@ -68,7 +67,7 @@
                 android:id="@+id/positiveTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:textColor="@color/vc_accent"
                 android:textSize="16sp" />
         </LinearLayout>

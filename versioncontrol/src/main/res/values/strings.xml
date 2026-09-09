@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">VersionControl</string>
+    <string name="vc_check_internet_connection">لطفا اتصال اینترنت خود را بررسی کرده و دوباره تلاش نمایید.</string>
+    <string name="vc_share_via">به اشتراک گذاری از طریق:</string>
+    <string name="vc_no_internet">دستگاه شما به اینترنت متصل نیست. لطفا بعد از بررسی دوباره تلاش نمایید.</string>
+    <string name="vc_no_host">ارتباط با سرور برقرار نشد. لطفا دوباره تلاش نمایید.</string>
 </resources>

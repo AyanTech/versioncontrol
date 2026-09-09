@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="ir.ayantech.versioncontrol">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -11,9 +10,10 @@
 
     <application>
         <activity
-            android:name=".VersionControlActivity"
+            android:name=".ui.VersionControlActivity"
             android:theme="@style/DialogActivity"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:exported="false"/>
         <provider
             android:name=".MyFileProvider"
             android:authorities="${applicationId}.provider"
