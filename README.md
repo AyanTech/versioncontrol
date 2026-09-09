@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/AyanTech/OCR-SDK.svg)](https://jitpack.io/#AyanTech/OCR-SDK)
+
 # AyanTech Version Control SDK for Android
 
 An Android SDK for managing application version checking, automatic/manual updates, direct APK downloading and installation, market store redirection, and app sharing across Android applications.
