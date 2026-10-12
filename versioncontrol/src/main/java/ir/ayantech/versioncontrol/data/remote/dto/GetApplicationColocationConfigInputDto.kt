@@ -7,6 +7,8 @@ data class GetApplicationColocationConfigInputDto(
     val applicationType: String?,
     @SerializedName("ApplicationName")
     val applicationName: String?,
+    @SerializedName("ApplicationOrigin")
+    val applicationOrigin: String?,
     @SerializedName("ColocationType")
     val colocationType: String?,
     @SerializedName("CurrentApplicationVersion")

@@ -53,11 +53,13 @@ class VersionControl internal constructor(
         applicationType: String = VersionControlConfig.DEFAULT_APPLICATION_TYPE,
         applicationVersion: String,
         iranBaseUrl: String,
-        internationalBaseUrl: String
+        internationalBaseUrl: String,
+        applicationOrigin: String
     ): Result<ColocationConfigResult> {
         return getApplicationColocationConfigUseCase(
             applicationName = applicationName,
             applicationType = applicationType,
+            applicationOrigin = applicationOrigin,
             applicationVersion = applicationVersion,
             iranBaseUrl = iranBaseUrl,
             internationalBaseUrl = internationalBaseUrl
@@ -78,9 +80,10 @@ class VersionControl internal constructor(
                 IllegalArgumentException("International base URL must be provided by the application.")
             )
         return getApplicationColocationConfig(
-            applicationName = config.applicationName ?: "",
+            applicationName = config.applicationName.orEmpty(),
             applicationType = config.applicationType,
-            applicationVersion = config.applicationVersion ?: "",
+            applicationOrigin = config.applicationOrigin.orEmpty(),
+            applicationVersion = config.applicationVersion.orEmpty(),
             iranBaseUrl = iranBaseUrl,
             internationalBaseUrl = internationalBaseUrl
         )
@@ -92,7 +95,8 @@ class VersionControl internal constructor(
 
         private fun getRemoteDataSource(): VersionControlRemoteDataSource {
             return sharedRemoteDataSource ?: synchronized(this) {
-                sharedRemoteDataSource ?: VersionControlRemoteDataSourceImpl().also { sharedRemoteDataSource = it }
+                sharedRemoteDataSource
+                    ?: VersionControlRemoteDataSourceImpl().also { sharedRemoteDataSource = it }
             }
         }
 

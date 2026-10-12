@@ -10,5 +10,6 @@ interface GetApplicationColocationConfigUseCase {
         applicationVersion: String,
         iranBaseUrl: String,
         internationalBaseUrl: String,
+        applicationOrigin: String,
     ): Result<ColocationConfigResult>
 }

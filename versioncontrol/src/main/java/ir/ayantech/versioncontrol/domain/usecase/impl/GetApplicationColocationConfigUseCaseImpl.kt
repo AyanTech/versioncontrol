@@ -17,10 +17,12 @@ class GetApplicationColocationConfigUseCaseImpl(
         applicationVersion: String,
         iranBaseUrl: String,
         internationalBaseUrl: String,
+        applicationOrigin: String,
     ): Result<ColocationConfigResult> {
         return repository.getApplicationColocationConfig(
             applicationName = applicationName,
             applicationType = applicationType,
+            applicationOrigin = applicationOrigin,
             applicationVersion = applicationVersion,
             iranBaseUrl = iranBaseUrl,
             internationalBaseUrl = internationalBaseUrl,

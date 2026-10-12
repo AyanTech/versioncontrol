@@ -24,6 +24,7 @@ class VersionControlCore private constructor(
     private var internationalBaseUrl: String? = null
     private var applicationName: String? = null
     private var applicationType: String? = null
+    private var applicationOrigin: String? = null
     private var applicationVersion: String? = null
     private var categoryName: String? = null
     private var extraInfo: ExtraInfoModel? = null
@@ -88,6 +89,11 @@ class VersionControlCore private constructor(
         return this
     }
 
+    fun setApplicationOrigin(applicationOrigin: String): VersionControlCore {
+        this.applicationOrigin = applicationOrigin
+        return this
+    }
+
     fun setCategoryName(categoryName: String?): VersionControlCore {
         this.categoryName = categoryName
         return this
@@ -116,6 +122,7 @@ class VersionControlCore private constructor(
             internationalBaseUrl = internationalBaseUrl,
             applicationName = applicationName,
             applicationType = applicationType ?: VersionControlConfig.DEFAULT_APPLICATION_TYPE,
+            applicationOrigin = applicationOrigin,
             categoryName = categoryName,
             applicationVersion = applicationVersion,
             extraInfo = extraInfo,
@@ -130,7 +137,8 @@ class VersionControlCore private constructor(
     ): Result<ColocationConfigResult> {
         initializeProperties(context)
         val versionControl = VersionControl.create(context)
-        val appName = applicationName ?: ""
+        val appName = applicationName.orEmpty()
+        val appOrigin = applicationOrigin.orEmpty()
         val appType = applicationType ?: VersionControlConfig.DEFAULT_APPLICATION_TYPE
         val appVersion = applicationVersion ?: getApplicationVersion(context)
         val resolvedIranBaseUrl = iranBaseUrl
@@ -147,6 +155,7 @@ class VersionControlCore private constructor(
         val result = versionControl.getApplicationColocationConfig(
             applicationName = appName,
             applicationType = appType,
+            applicationOrigin = appOrigin,
             applicationVersion = appVersion,
             iranBaseUrl = resolvedIranBaseUrl,
             internationalBaseUrl = resolvedInternationalBaseUrl

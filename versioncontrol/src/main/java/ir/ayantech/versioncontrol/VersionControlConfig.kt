@@ -12,7 +12,8 @@ data class VersionControlConfig(
     val extraInfo: ExtraInfoModel? = null,
     val typeface: Typeface? = null,
     val iranBaseUrl: String? = null,
-    val internationalBaseUrl: String? = null
+    val internationalBaseUrl: String? = null,
+    val applicationOrigin: String? = null
 ) {
     companion object {
         const val DEFAULT_APPLICATION_TYPE = "android"
