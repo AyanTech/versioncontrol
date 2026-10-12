@@ -1,8 +1,12 @@
 package ir.ayantech.versioncontrol.data.remote.client
 
+import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
+import ir.ayantech.versioncontrol.data.remote.dto.GetApplicationColocationConfigInputDto
+import ir.ayantech.versioncontrol.data.remote.dto.VCRequestDto
 import kotlinx.coroutines.test.runTest
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
@@ -11,7 +15,9 @@ import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
+import okio.Buffer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
@@ -50,6 +56,44 @@ class VersionControlHttpClientTest {
 
         // Assert
         assertEquals("ok", result.status)
+    }
+
+    @Test
+    fun `post serializes application origin with the API field name`() = runTest {
+        val call: Call = mockk()
+        val requestSlot = slot<Request>()
+        every { okHttpClient.newCall(capture(requestSlot)) } returns call
+        every { call.execute() } returns Response.Builder()
+            .request(Request.Builder().url("https://example.com/api/GetApplicationColocationConfig").build())
+            .protocol(Protocol.HTTP_1_1)
+            .code(200)
+            .message("OK")
+            .body("{}".toResponseBody("application/json".toMediaType()))
+            .build()
+
+        val request = VCRequestDto(
+            GetApplicationColocationConfigInputDto(
+                applicationType = "android",
+                applicationName = "testApp",
+                applicationOrigin = "play-store",
+                colocationType = "Iran1",
+                currentApplicationVersion = "1.0.0"
+            )
+        )
+        httpClient.post<VCRequestDto<GetApplicationColocationConfigInputDto>, DummyResponse>(
+            baseUrl = "https://example.com/api/",
+            endpoint = "GetApplicationColocationConfig",
+            requestBody = request
+        )
+
+        val body = Buffer()
+        requestSlot.captured.body!!.writeTo(body)
+        val parameters = JsonParser.parseString(body.readUtf8())
+            .asJsonObject
+            .getAsJsonObject("Parameters")
+
+        assertEquals("play-store", parameters.get("ApplicationOrigin").asString)
+        assertFalse(parameters.has("applicationOrigin"))
     }
 
     @Test

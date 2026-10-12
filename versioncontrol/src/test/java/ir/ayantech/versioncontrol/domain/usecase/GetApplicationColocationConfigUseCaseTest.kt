@@ -22,42 +22,45 @@ class GetApplicationColocationConfigUseCaseTest {
     private val internationalBaseUrl = "https://international.example.com/App.svc/"
 
     @Test
-    fun `invoke returns mapped ColocationConfigResult when repository succeeds`() = runTest {
-        // Arrange
-        val response = GetApplicationColocationConfigResponseDto(
-            parameters = GetApplicationColocationConfigParametersDto(
-                endpointList = listOf(
-                    EndpointDto(name = "VersionControl", url = "https://vc.example.com/"),
-                    EndpointDto(name = "CoreApi", url = "https://core.example.com/")
-                )
-            ),
-            status = VCStatusDto("G00000", "Success")
-        )
-        coEvery {
-            repository.getApplicationColocationConfig(
-                "testApp",
-                "android",
-                "1.0.0",
-                iranBaseUrl,
-                internationalBaseUrl
+    fun `invoke forwards application origin and returns mapped ColocationConfigResult when repository succeeds`() =
+        runTest {
+            // Arrange
+            val response = GetApplicationColocationConfigResponseDto(
+                parameters = GetApplicationColocationConfigParametersDto(
+                    endpointList = listOf(
+                        EndpointDto(name = "VersionControl", url = "https://vc.example.com/"),
+                        EndpointDto(name = "CoreApi", url = "https://core.example.com/")
+                    )
+                ),
+                status = VCStatusDto("G00000", "Success")
             )
-        } returns Result.success(response)
+            coEvery {
+                repository.getApplicationColocationConfig(
+                    applicationName = "testApp",
+                    applicationType = "android",
+                    applicationOrigin = "test-origin",
+                    applicationVersion = "1.0.0",
+                    iranBaseUrl = iranBaseUrl,
+                    internationalBaseUrl = internationalBaseUrl
+                )
+            } returns Result.success(response)
 
-        // Act
-        val result = useCase(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
-        )
+            // Act
+            val result = useCase(
+                applicationName = "testApp",
+                applicationType = "android",
+                applicationVersion = "1.0.0",
+                iranBaseUrl = iranBaseUrl,
+                internationalBaseUrl = internationalBaseUrl,
+                applicationOrigin = "test-origin"
+            )
 
-        // Assert
-        assertTrue(result.isSuccess)
-        val configResult = result.getOrNull()!!
-        assertEquals("https://vc.example.com/", configResult.versionControlBaseUrl)
-        assertEquals(2, configResult.endpointList.size)
-    }
+            // Assert
+            assertTrue(result.isSuccess)
+            val configResult = result.getOrNull()!!
+            assertEquals("https://vc.example.com/", configResult.versionControlBaseUrl)
+            assertEquals(2, configResult.endpointList.size)
+        }
 
     @Test
     fun `invoke passes custom base URLs to repository`() = runTest {
@@ -73,7 +76,14 @@ class GetApplicationColocationConfigUseCaseTest {
             status = VCStatusDto("G00000", "Success")
         )
         coEvery {
-            repository.getApplicationColocationConfig("testApp", "android", "1.0.0", customIran, customIntl)
+            repository.getApplicationColocationConfig(
+                applicationName = "testApp",
+                applicationType = "android",
+                applicationOrigin = "testOrigin",
+                applicationVersion = "1.0.0",
+                iranBaseUrl = customIran,
+                internationalBaseUrl = customIntl
+            )
         } returns Result.success(response)
 
         // Act
@@ -82,7 +92,8 @@ class GetApplicationColocationConfigUseCaseTest {
             applicationType = "android",
             applicationVersion = "1.0.0",
             iranBaseUrl = customIran,
-            internationalBaseUrl = customIntl
+            internationalBaseUrl = customIntl,
+            applicationOrigin = "testOrigin"
         )
 
         // Assert
@@ -100,21 +111,23 @@ class GetApplicationColocationConfigUseCaseTest {
         )
         coEvery {
             repository.getApplicationColocationConfig(
-                "testApp",
-                "android",
-                "1.0.0",
-                iranBaseUrl,
-                internationalBaseUrl
+                applicationName = "testApp",
+                applicationType = "android",
+                applicationOrigin = "testOrigin",
+                applicationVersion = "1.0.0",
+                iranBaseUrl = iranBaseUrl,
+                internationalBaseUrl = internationalBaseUrl
             )
         } returns Result.success(response)
 
         // Act
         val result = useCase(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl,
+            applicationOrigin = "testOrigin"
         )
 
         // Assert
@@ -131,21 +144,23 @@ class GetApplicationColocationConfigUseCaseTest {
         )
         coEvery {
             repository.getApplicationColocationConfig(
-                "testApp",
-                "android",
-                "1.0.0",
-                iranBaseUrl,
-                internationalBaseUrl
+                applicationName = "testApp",
+                applicationType = "android",
+                applicationOrigin = "testOrigin",
+                applicationVersion = "1.0.0",
+                iranBaseUrl = iranBaseUrl,
+                internationalBaseUrl = internationalBaseUrl
             )
         } returns Result.success(response)
 
         // Act
         val result = useCase(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl,
+            applicationOrigin = "testOrigin"
         )
 
         // Assert
@@ -159,21 +174,23 @@ class GetApplicationColocationConfigUseCaseTest {
         val exception = IllegalStateException("Failed to connect")
         coEvery {
             repository.getApplicationColocationConfig(
-                "testApp",
-                "android",
-                "1.0.0",
-                iranBaseUrl,
-                internationalBaseUrl
+                applicationName = "testApp",
+                applicationType = "android",
+                applicationOrigin = "testOrigin",
+                applicationVersion = "1.0.0",
+                iranBaseUrl = iranBaseUrl,
+                internationalBaseUrl = internationalBaseUrl
             )
         } returns Result.failure(exception)
 
         // Act
         val result = useCase(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl,
+            applicationOrigin = "testOrigin"
         )
 
         // Assert
