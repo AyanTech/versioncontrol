@@ -24,6 +24,7 @@ interface VersionControlRepository {
     suspend fun getApplicationColocationConfig(
         applicationName: String,
         applicationType: String,
+        applicationOrigin: String,
         applicationVersion: String,
         iranBaseUrl: String,
         internationalBaseUrl: String,

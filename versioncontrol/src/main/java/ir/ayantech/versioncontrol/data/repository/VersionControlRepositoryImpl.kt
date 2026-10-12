@@ -54,6 +54,7 @@ class VersionControlRepositoryImpl(
     override suspend fun getApplicationColocationConfig(
         applicationName: String,
         applicationType: String,
+        applicationOrigin: String,
         applicationVersion: String,
         iranBaseUrl: String,
         internationalBaseUrl: String,
@@ -72,6 +73,7 @@ class VersionControlRepositoryImpl(
         val iranResult = requestColocationConfig(
             applicationName = applicationName,
             applicationType = applicationType,
+            applicationOrigin = applicationOrigin,
             applicationVersion = applicationVersion,
             lane = ColocationLane.IRAN,
             baseUrl = iranBaseUrl
@@ -84,6 +86,7 @@ class VersionControlRepositoryImpl(
         val internationalResult = requestColocationConfig(
             applicationName = applicationName,
             applicationType = applicationType,
+            applicationOrigin = applicationOrigin,
             applicationVersion = applicationVersion,
             lane = ColocationLane.INTERNATIONAL,
             baseUrl = internationalBaseUrl
@@ -95,6 +98,7 @@ class VersionControlRepositoryImpl(
         applicationName: String,
         applicationType: String,
         applicationVersion: String,
+        applicationOrigin: String,
         lane: ColocationLane,
         baseUrl: String,
     ): Result<GetApplicationColocationConfigResponseDto> {
@@ -102,6 +106,7 @@ class VersionControlRepositoryImpl(
             val inputDto = GetApplicationColocationConfigInputDto(
                 applicationType = applicationType,
                 applicationName = applicationName,
+                applicationOrigin = applicationOrigin,
                 colocationType = lane.laneId,
                 currentApplicationVersion = applicationVersion
             )

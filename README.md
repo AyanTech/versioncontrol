@@ -90,6 +90,7 @@ lifecycleScope.launch {
         .setIranBaseUrl("IRAN_1_COLOCATION_BASE_URL")
         .setInternationalBaseUrl("INTERNATIONAL_COLOCATION_BASE_URL")
         .setApplicationName("myApplicationName")
+        .setApplicationOrigin("myket")
         .setApplicationVersion(VersionControlCore.getApplicationVersion(this@MainActivity))
         .getApplicationColocationConfig(this@MainActivity)
 

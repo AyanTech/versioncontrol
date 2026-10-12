@@ -40,6 +40,7 @@ class VersionControlRepositoryImplTest {
     private val baseUrl = "https://example.com/api/"
     private val iranBaseUrl = "https://iran.example.com/App.svc/"
     private val internationalBaseUrl = "https://international.example.com/App.svc/"
+    private val applicationOrigin = "test-origin"
 
     @Test
     fun `checkVersion returns raw response DTO on remote success`() = runTest(testDispatcher) {
@@ -128,17 +129,21 @@ class VersionControlRepositoryImplTest {
         coEvery {
             remoteDataSource.getApplicationColocationConfig(
                 baseUrl = iranBaseUrl,
-                request = match { it.parameters?.colocationType == "Iran1" }
+                request = match {
+                    it.parameters?.colocationType == "Iran1" &&
+                        it.parameters?.applicationOrigin == applicationOrigin
+                }
             )
         } returns responseDto
 
         // Act
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl
         )
 
         // Assert
@@ -177,6 +182,7 @@ class VersionControlRepositoryImplTest {
         val result = repository.getApplicationColocationConfig(
             applicationName = "testApp",
             applicationType = "android",
+            applicationOrigin = applicationOrigin,
             applicationVersion = "1.0.0",
             iranBaseUrl = customIranUrl,
             internationalBaseUrl = customIntlUrl
@@ -201,7 +207,10 @@ class VersionControlRepositoryImplTest {
         coEvery {
             remoteDataSource.getApplicationColocationConfig(
                 baseUrl = iranBaseUrl,
-                request = any()
+                request = match {
+                    it.parameters?.colocationType == "Iran1" &&
+                        it.parameters.applicationOrigin == applicationOrigin
+                }
             )
         } returns iranResponseDto
 
@@ -216,17 +225,21 @@ class VersionControlRepositoryImplTest {
         coEvery {
             remoteDataSource.getApplicationColocationConfig(
                 baseUrl = internationalBaseUrl,
-                request = match { it.parameters?.colocationType == "International" }
+                request = match {
+                    it.parameters?.colocationType == "International" &&
+                        it.parameters.applicationOrigin == applicationOrigin
+                }
             )
         } returns intlResponseDto
 
         // Act
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl
         )
 
         // Assert
@@ -236,11 +249,17 @@ class VersionControlRepositoryImplTest {
         coVerifyOrder {
             remoteDataSource.getApplicationColocationConfig(
                 baseUrl = iranBaseUrl,
-                request = any()
+                request = match {
+                    it.parameters?.colocationType == "Iran1" &&
+                        it.parameters.applicationOrigin == applicationOrigin
+                }
             )
             remoteDataSource.getApplicationColocationConfig(
                 baseUrl = internationalBaseUrl,
-                request = any()
+                request = match {
+                    it.parameters?.colocationType == "International" &&
+                        it.parameters.applicationOrigin == applicationOrigin
+                }
             )
         }
         coVerify(exactly = 1) {
@@ -285,11 +304,12 @@ class VersionControlRepositoryImplTest {
 
         // Act
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl
         )
 
         // Assert
@@ -321,11 +341,12 @@ class VersionControlRepositoryImplTest {
 
         // Act
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl
         )
 
         // Assert
@@ -352,11 +373,12 @@ class VersionControlRepositoryImplTest {
 
         // Act
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            iranBaseUrl,
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = iranBaseUrl,
+            internationalBaseUrl = internationalBaseUrl
         )
 
         // Assert
@@ -367,11 +389,12 @@ class VersionControlRepositoryImplTest {
     @Test
     fun `getApplicationColocationConfig rejects a missing Iran URL without making a request`() = runTest(testDispatcher) {
         val result = repository.getApplicationColocationConfig(
-            "testApp",
-            "android",
-            "1.0.0",
-            " ",
-            internationalBaseUrl
+            applicationName = "testApp",
+            applicationType = "android",
+            applicationOrigin = applicationOrigin,
+            applicationVersion = "1.0.0",
+            iranBaseUrl = " ",
+            internationalBaseUrl = internationalBaseUrl
         )
 
         assertTrue(result.isFailure)
@@ -389,6 +412,7 @@ class VersionControlRepositoryImplTest {
         val result = repository.getApplicationColocationConfig(
             "testApp",
             "android",
+            applicationOrigin,
             "1.0.0",
             iranBaseUrl,
             ""

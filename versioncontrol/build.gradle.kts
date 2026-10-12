@@ -45,7 +45,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.ayantech"
             artifactId = "versioncontrol"
-            version = "0.6.3"
+            version = "1.1.0"
 
             afterEvaluate {
                 from(components["release"])
