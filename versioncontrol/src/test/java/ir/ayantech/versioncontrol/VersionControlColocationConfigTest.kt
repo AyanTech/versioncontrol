@@ -33,8 +33,10 @@ class VersionControlColocationConfigTest {
 
     @Test
     fun `direct API forwards application origin and custom base URLs`() = runTest {
+        // Arrange
         stubRepository("direct-origin")
 
+        // Act
         val result = versionControl.getApplicationColocationConfig(
             applicationName = "testApp",
             applicationVersion = "1.0.0",
@@ -43,6 +45,7 @@ class VersionControlColocationConfigTest {
             applicationOrigin = "direct-origin"
         )
 
+        // Assert
         assertTrue(result.isSuccess)
         assertEquals("https://vc.example.com/", result.getOrThrow().versionControlBaseUrl)
         verifyRepositoryCall("direct-origin")
@@ -50,6 +53,7 @@ class VersionControlColocationConfigTest {
 
     @Test
     fun `config API forwards application origin and custom base URLs`() = runTest {
+        // Arrange
         stubRepository("config-origin")
         val config = VersionControlConfig(
             baseUrl = "https://unused.example.com/",
@@ -60,8 +64,10 @@ class VersionControlColocationConfigTest {
             applicationOrigin = "config-origin"
         )
 
+        // Act
         val result = versionControl.getApplicationColocationConfig(config)
 
+        // Assert
         assertTrue(result.isSuccess)
         assertEquals("https://vc.example.com/", result.getOrThrow().versionControlBaseUrl)
         verifyRepositoryCall("config-origin")
@@ -69,8 +75,10 @@ class VersionControlColocationConfigTest {
 
     @Test
     fun `direct API forwards an empty origin`() = runTest {
+        // Arrange
         stubRepository("")
 
+        // Act
         val result = versionControl.getApplicationColocationConfig(
             applicationName = "testApp",
             applicationType = "android",
@@ -80,12 +88,14 @@ class VersionControlColocationConfigTest {
             applicationOrigin = ""
         )
 
+        // Assert
         assertTrue(result.isSuccess)
         verifyRepositoryCall("")
     }
 
     @Test
     fun `config API retains empty origin when omitted`() = runTest {
+        // Arrange
         stubRepository("")
         val config = VersionControlConfig(
             baseUrl = "https://unused.example.com/",
@@ -95,8 +105,10 @@ class VersionControlColocationConfigTest {
             internationalBaseUrl = internationalBaseUrl
         )
 
+        // Act
         val result = versionControl.getApplicationColocationConfig(config)
 
+        // Assert
         assertTrue(result.isSuccess)
         verifyRepositoryCall("")
     }

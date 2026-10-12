@@ -60,6 +60,7 @@ class VersionControlHttpClientTest {
 
     @Test
     fun `post serializes application origin with the API field name`() = runTest {
+        // Arrange
         val call: Call = mockk()
         val requestSlot = slot<Request>()
         every { okHttpClient.newCall(capture(requestSlot)) } returns call
@@ -80,12 +81,15 @@ class VersionControlHttpClientTest {
                 currentApplicationVersion = "1.0.0"
             )
         )
+
+        // Act
         httpClient.post<VCRequestDto<GetApplicationColocationConfigInputDto>, DummyResponse>(
             baseUrl = "https://example.com/api/",
             endpoint = "GetApplicationColocationConfig",
             requestBody = request
         )
 
+        // Assert
         val body = Buffer()
         requestSlot.captured.body!!.writeTo(body)
         val parameters = JsonParser.parseString(body.readUtf8())
